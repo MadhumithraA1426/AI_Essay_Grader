@@ -3,7 +3,8 @@ from textblob import TextBlob
 import textstat
 import nltk
 
-# Auto-download required corpora if missing (important for Render & new setups)
+# Ensure NLTK corpora are downloaded at runtime
+nltk.download('punkt_tab')
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('wordnet')
@@ -14,42 +15,36 @@ app = Flask(__name__)
 def analyze_essay(text):
     blob = TextBlob(text)
 
-    # Basic metrics
+    # Word and sentence counts
     word_count = len(blob.words)
     sentence_count = len(blob.sentences)
 
-    # Correct grammar/spelling
-    corrected_text = str(blob.correct())
+    # Sentiment analysis
+    polarity = round(blob.sentiment.polarity, 2)
+    subjectivity = round(blob.sentiment.subjectivity, 2)
 
-    # Count spelling errors (words changed)
-    spelling_errors = sum(1 for word in blob.words if word.lower() not in corrected_text.lower())
+    # Readability score (Flesch Reading Ease)
+    readability = round(textstat.flesch_reading_ease(text), 2)
 
-    # Readability score
-    readability = textstat.flesch_reading_ease(text)
-
-    # Sentiment (polarity: -1 to 1, subjectivity: 0 to 1)
-    sentiment = blob.sentiment
+    # Grade level
+    grade_level = textstat.text_standard(text)
 
     return {
         "word_count": word_count,
         "sentence_count": sentence_count,
-        "corrected_text": corrected_text,
-        "spelling_errors": spelling_errors,
+        "polarity": polarity,
+        "subjectivity": subjectivity,
         "readability": readability,
-        "sentiment": {
-            "polarity": sentiment.polarity,
-            "subjectivity": sentiment.subjectivity
-        }
+        "grade_level": grade_level
     }
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    result = None
-    essay_text = ""
     if request.method == "POST":
         essay_text = request.form["essay"]
         result = analyze_essay(essay_text)
-    return render_template("index.html", result=result, essay_text=essay_text)
+        return render_template("index.html", result=result, essay=essay_text)
+    return render_template("index.html", result=None, essay="")
 
 if __name__ == "__main__":
     app.run(debug=True)
