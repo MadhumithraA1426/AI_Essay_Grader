@@ -9,16 +9,21 @@
     <div class="container">
         <h1>AI Essay Grader</h1>
         <form method="POST">
-            <textarea name="essay" rows="10" placeholder="Paste your essay here..." required></textarea>
+            <textarea name="essay" rows="10" placeholder="Paste your essay here..." required>{{ essay }}</textarea>
             <button type="submit">Analyze Essay</button>
         </form>
 
         {% if result %}
             <div class="results">
                 <h2>Results:</h2>
-                <p><strong>Corrected Text:</strong></p>
-                <div class="corrected-text">{{ result.corrected_text }}</div>
-                <p><strong>Spelling Errors Detected:</strong> {{ result.spelling_errors }}</p>
+                <ul>
+                    <li><strong>Word count:</strong> {{ result.word_count }}</li>
+                    <li><strong>Sentence count:</strong> {{ result.sentence_count }}</li>
+                    <li><strong>Polarity:</strong> {{ result.polarity }}</li>
+                    <li><strong>Subjectivity:</strong> {{ result.subjectivity }}</li>
+                    <li><strong>Readability (Flesch):</strong> {{ result.readability }}</li>
+                    <li><strong>Grade level:</strong> {{ result.grade_level }}</li>
+                </ul>
             </div>
         {% endif %}
     </div>
