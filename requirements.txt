@@ -3,3 +3,4 @@ textblob==0.17.1
 textstat==0.7.3
 nltk==3.9.1
 gunicorn==21.2.0
+setuptools>=65.0.0
